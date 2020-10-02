@@ -1,30 +1,26 @@
-#include <stdio.h>
- 
-int main()
-{
-  int array[100], search, c, n;
- 
-  printf("Enter the number of elements in array\n"); //Enter the number of array elements
-  scanf("%d", &n);
- 
-  printf("Enter %d integer(s)\n", n);
- 
-  for (c = 0; c < n; c++)
-    scanf("%d", &array[c]); //Enter each of the elements in the array
- 
-  printf("Enter a number to search\n");
-  scanf("%d", &search); //Enter the element to be searched
- 
-  for (c = 0; c < n; c++)
-  {
-    if (array[c] == search)    /* If required element is found */
-    {
-      printf("%d is present at location %d.\n", search, c+1);
-      break;
-    }
-  }
-  if (c == n)
-    printf("%d isn't present in the array.\n", search);
- 
-  return 0;
-}
+// C code to linearly search x in arr[]. If x 
+// is present then return its location, otherwise 
+// return -1 
+
+#include <stdio.h> 
+
+int search(int arr[], int n, int x) 
+{ 
+	int i; 
+	for (i = 0; i < n; i++) 
+		if (arr[i] == x) 
+			return i; 
+	return -1; 
+} 
+
+int main(void) 
+{ 
+	int arr[] = { 2, 3, 4, 10, 40 }; 
+	int x = 10; 
+	int n = sizeof(arr) / sizeof(arr[0]); 
+	int result = search(arr, n, x); 
+	(result == -1) ? printf("Element is not present in array") 
+				: printf("Element is present at index %d", 
+							result); 
+	return 0; 
+} 
