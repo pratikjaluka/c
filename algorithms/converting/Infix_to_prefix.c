@@ -1,143 +1,110 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<math.h>
-#include<string.h>
+// CPP program to convert infix to prefix 
+#include <bits/stdc++.h> 
+using namespace std; 
 
-int pop();
-int precedence(char symbol);
-int isEmpty();
-void infix_to_prefix();
-int checker(char symbol);
-void push(long int symbol);
+bool isOperator(char c) 
+{ 
+	return (!isalpha(c) && !isdigit(c)); 
+} 
 
-char prefix_string[20], infix_string[20], postfix_string[20];
-int top;
-long int stack[20];
+int getPriority(char C) 
+{ 
+	if (C == '-' || C == '+') 
+		return 1; 
+	else if (C == '*' || C == '/') 
+		return 2; 
+	else if (C == '^') 
+		return 3; 
+	return 0; 
+} 
 
-int main()
-{
-int count, length;
-char temp;
-top = -1;
-printf(“\nEnter an Expression in Infix format:\t”);
-scanf(“%[^\n]s”, infix_string);
-infix_to_prefix();
-printf(“\nExpression in Postfix Format: \t%s\n”, postfix_string);
-length = strlen(postfix_string) – 1;
-strncpy(prefix_string, postfix_string, 20);
-for(count = 0; count < length; count++, length–)
-{
-temp = prefix_string[count];
-prefix_string[count] = prefix_string[length];
-prefix_string[length] = temp;
-}
-printf(“\nExpression in Prefix Format: \t%s\n”, prefix_string);
-return 0;
-}
+string infixToPostfix(string infix) 
+{ 
+	infix = '(' + infix + ')'; 
+	int l = infix.size(); 
+	stack<char> char_stack; 
+	string output; 
 
-void infix_to_prefix()
-{
-unsigned int count, temp = 0;
-char next;
-char symbol;
-for(count = 0; count < strlen(infix_string); count++)
-{
-symbol = infix_string[count];
-if(!checker(symbol))
-{
-switch(symbol)
-{
-case ‘(‘: push(symbol);
-break;
-case ‘)’:
-while((next = pop()) != ‘(‘)
-{
-postfix_string[temp++] = next;
-}
-break;
-case ‘+’:
-case ‘-‘:
-case ‘*’:
-case ‘/’:
-case ‘%’:
-case ‘^’:
-while(!isEmpty() && precedence(stack[top]) >= precedence(symbol))
-postfix_string[temp++] = pop();
-push(symbol);
-break;
-default:
-postfix_string[temp++] = symbol;
-}
-}
-}
-while(!isEmpty())
-{
-postfix_string[temp++] = pop();
-}
-postfix_string[temp] = ‘\0’;
-}
+	for (int i = 0; i < l; i++) { 
 
-int precedence(char symbol)
-{
-switch(symbol)
-{
-case ‘(‘: return 0;
-case ‘+’:
-case ‘-‘:
-return 1;
-case ‘*’:
-case ‘/’:
-case ‘%’:
-return 2;
-case ‘^’:
-return 3;
-default:
-return 0;
-}
-}
+		// If the scanned character is an 
+		// operand, add it to output. 
+		if (isalpha(infix[i]) || isdigit(infix[i])) 
+			output += infix[i]; 
 
-int checker(char symbol)
-{
-if(symbol == ‘\t’ || symbol == ‘ ‘)
-{
-return 1;
-}
-else
-{
-return 0;
-}
-}
+		// If the scanned character is an 
+		// ‘(‘, push it to the stack. 
+		else if (infix[i] == '(') 
+			char_stack.push('('); 
 
-void push(long int symbol)
-{
-if(top > 20)
-{
-printf(“Stack Overflow\n”);
-exit(1);
-}
-top = top + 1;
-stack[top] = symbol;
-}
+		// If the scanned character is an 
+		// ‘)’, pop and output from the stack 
+		// until an ‘(‘ is encountered. 
+		else if (infix[i] == ')') { 
 
-int isEmpty()
-{
-if(top == -1)
-{
-return 1;
-}
-else
-{
-return 0;
-}
-}
-int pop()
-{
-if(isEmpty())
+			while (char_stack.top() != '(') { 
+				output += char_stack.top(); 
+				char_stack.pop(); 
+			} 
 
-{
-printf(“Stack is Empty\n”);
-exit(1);
-}
-return(stack[top--]);
+			// Remove '(' from the stack 
+			char_stack.pop(); 
+		} 
 
-}
+		// Operator found 
+		else { 
+			
+			if (isOperator(char_stack.top())) { 
+				while (getPriority(infix[i]) 
+				<= getPriority(char_stack.top())) { 
+					output += char_stack.top(); 
+					char_stack.pop(); 
+				} 
+
+				// Push current Operator on stack 
+				char_stack.push(infix[i]); 
+			} 
+		} 
+	} 
+	return output; 
+} 
+
+string infixToPrefix(string infix) 
+{ 
+	/* Reverse String 
+	* Replace ( with ) and vice versa 
+	* Get Postfix 
+	* Reverse Postfix * */
+	int l = infix.size(); 
+
+	// Reverse infix 
+	reverse(infix.begin(), infix.end()); 
+
+	// Replace ( with ) and vice versa 
+	for (int i = 0; i < l; i++) { 
+
+		if (infix[i] == '(') { 
+			infix[i] = ')'; 
+			i++; 
+		} 
+		else if (infix[i] == ')') { 
+			infix[i] = '('; 
+			i++; 
+		} 
+	} 
+
+	string prefix = infixToPostfix(infix); 
+
+	// Reverse postfix 
+	reverse(prefix.begin(), prefix.end()); 
+
+	return prefix; 
+} 
+
+// Driver code 
+int main() 
+{ 
+	string s = ("(a-b/c)*(a/k-l)"); 
+	cout << infixToPrefix(s) << std::endl; 
+	return 0; 
+} 
